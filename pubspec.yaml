@@ -1,0 +1,138 @@
+name: divine_employee_app
+description: A new Flutter project.
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# Project version (build number included for iOS)
+version: 1.0.8+11   # for ios
+
+# SDK environment constraints
+environment:
+  sdk: '>=3.0.5 <4.0.0'
+
+# App dependencies
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # iOS style icons
+  cupertino_icons: ^1.0.2
+
+  # SVG support
+  flutter_svg: ^2.0.7
+
+  # Custom progress bar animations
+  simple_animation_progress_bar: ^1.6.0
+
+  # Card swiper / slider
+  card_swiper: ^3.0.1
+
+  # Lottie animations
+  lottie: ^2.6.0
+
+  # Flushbar notifications
+  another_flushbar: ^1.12.30
+
+  # Toast messages
+  fluttertoast: ^8.2.2
+
+  # Package rename helper
+  rename: ^2.1.1
+
+  # App launcher icons package
+  flutter_launcher_icons: ^0.14.4
+
+  # State management
+  provider: ^6.0.5
+
+  # HTTP networking
+  http: ^1.1.0
+
+  # Local storage
+  shared_preferences: ^2.2.1
+
+  # Image picker from gallery/camera
+  image_picker: ^1.0.4
+
+  # Runtime permissions handler
+  permission_handler: ^11.0.1
+
+  # PDF viewer
+  syncfusion_flutter_pdfviewer: ^31.2.10
+
+  # File picker
+  file_picker: ^10.3.6
+
+  # Firebase core
+  firebase_core: ^3.10.0
+
+  # Firebase messaging (notifications)
+  firebase_messaging: ^15.1.0
+
+  # Local notifications
+  flutter_local_notifications: ^17.2.2
+
+  # Open app settings
+  app_settings: ^5.1.1
+
+  # Shimmer loading effect
+  shimmer: ^3.0.0
+
+  # Socket IO
+  socket_io_client: ^2.0.3+1
+
+  # Screenshot capture
+  screenshot: ^3.0.0
+
+  # Social sharing
+  share_plus: ^7.2.1
+
+  # File system paths
+  path_provider: ^2.1.2
+
+  # QR code scanner
+  qr_code_scanner: ^1.0.1
+
+  # Google APIs auth
+  googleapis_auth: ^1.6.0
+
+  # Internationalization / date formatting
+  intl: ^0.18.0
+
+  # URL launcher
+  url_launcher: ^6.0.17
+
+  # Geocoding (address from coordinates)
+  geocoding: ^3.0.0
+
+  # Location services
+  location: ^7.0.1
+
+# Dev dependencies (for testing & linting)
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Recommended lint rules
+  flutter_lints: ^2.0.0
+
+# Launcher icons configuration (DO NOT MODIFY)
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/launcher_icon.png"
+  remove_alpha_ios: true
+
+# Flutter specific configurations
+flutter:
+  # Enable material icons
+  uses-material-design: true
+
+  # Asset directories
+  assets:
+    - assets/
+    - assets/icons/
+    - assets/svg/
+    - assets/animations/
