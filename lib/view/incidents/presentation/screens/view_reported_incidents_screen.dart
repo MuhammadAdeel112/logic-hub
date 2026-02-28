@@ -12,7 +12,7 @@ class ViewReportedIncidentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReuseableScaffoldScreen(
-      appBarTitle: 'Detials',
+      appBarTitle: 'Detials', // Note: Same as your code typo 'Detials'
       content: ListView.builder(
           itemCount: 1,
           itemBuilder: (context, index) {
@@ -95,9 +95,11 @@ class ViewReportedIncidentScreen extends StatelessWidget {
                               size: 15,
                             ),
                           ),
-                          Text(
-                            incident.location,
-                            style: AppConstants.kTextStyleMediumRegularGrey,
+                          Expanded( // Added Expanded to prevent text overflow
+                            child: Text(
+                              incident.location,
+                              style: AppConstants.kTextStyleMediumRegularGrey,
+                            ),
                           ),
                         ],
                       ),
@@ -257,30 +259,51 @@ class ViewReportedIncidentScreen extends StatelessWidget {
                       Divider(
                         color: Colors.transparent,
                       ),
+                      // --- UPDATED IMAGE SECTION ---
                       Row(
                         children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  SlideTransitionPage(
-                                      page: ReuseableViewImageFullScreen(
-                                    imageUrl: incident.imageUrl,
-                                  )));
-                            },
-                            child: Container(
-                                width: MediaQuery.of(context).size.width / 3,
-                                height: MediaQuery.of(context).size.height / 9,
-                                decoration: ShapeDecoration(
-                                    color: AppConstants.kcwhiteColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    shadows: AppConstants.kShadows),
-                                padding: EdgeInsets.all(16),
-                                child: Center(
-                                    child: Image.network(incident.imageUrl))),
-                          ),
+                          // 🔥 Check if image exists before showing
+                          if (incident.imageUrl != null && incident.imageUrl!.isNotEmpty)
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    SlideTransitionPage(
+                                        page: ReuseableViewImageFullScreen(
+                                          imageUrl: incident.imageUrl!, // ! confirms not null
+                                        )));
+                              },
+                              child: Container(
+                                  width: MediaQuery.of(context).size.width / 3,
+                                  height: MediaQuery.of(context).size.height / 9,
+                                  decoration: ShapeDecoration(
+                                      color: AppConstants.kcwhiteColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      shadows: AppConstants.kShadows),
+                                  padding: EdgeInsets.all(8),
+                                  child: Center(
+                                      child: Image.network(
+                                        incident.imageUrl!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) =>
+                                            Icon(Icons.broken_image, color: Colors.grey),
+                                      ))),
+                            )
+                          else
+                          // 🔥 Placeholder if image is null
+                            Container(
+                              width: MediaQuery.of(context).size.width / 3,
+                              height: MediaQuery.of(context).size.height / 9,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Center(
+                                child: Icon(Icons.image_not_supported, color: Colors.grey),
+                              ),
+                            ),
                         ],
                       )
                     ],

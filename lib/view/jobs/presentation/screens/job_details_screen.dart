@@ -65,7 +65,7 @@ class JobDetailsScreen extends StatefulWidget {
 
 class _JobDetailsScreenState extends State<JobDetailsScreen> {
 
-  /// ✅ FIX: Client ID ab direct client object se bhi read hogi
+  /// FIX: Client ID ab direct client object se bhi read hogi
   /// Aur sirf last 6 digits show hongi
   String getClientIdLastSix() {
     final String? id = widget.clientId ??
@@ -118,7 +118,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   jobId: widget.jobId,
                   managerId: widget.shiftManagerId,
                   managerName: widget.shiftManagerName,
-                  clientId: getClientIdLastSix(), // ✅ last 6 digits
+                  clientId: getClientIdLastSix(), //  last 6 digits
                 ),
                 JobDetailsWidget(
                   shiftManagerName: widget.shiftManagerName,
@@ -141,7 +141,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   clientInfoForAssignedJobs: widget.clientInfoForAssignedJobs,
                   clientInfoForAvailableJobs:
                   widget.clientInfoForAvailableJobs,
-                  clientId: getClientIdLastSix(), // ✅ last 6 digits
+                  clientId: getClientIdLastSix(), //  last 6 digits
                   riskAssessment: riskAssessment,
                   livingArrangement: livingArrangement,
                   goal: goal,

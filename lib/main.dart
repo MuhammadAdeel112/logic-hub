@@ -18,7 +18,7 @@ import 'package:divine_employee_app/api_provider/job_cancelation_request_provide
 import 'package:divine_employee_app/api_provider/job_provider.dart';
 import 'package:divine_employee_app/api_provider/profile_update_api_provider.dart';
 import 'package:divine_employee_app/api_provider/task_update_api_provider.dart';
-import 'package:divine_employee_app/firebase_options.dart'
+import 'package:divine_employee_app/firebase_options.dart';
 import 'package:divine_employee_app/view/availability/presentation/provider/avilability_notifier.dart';
 import 'package:divine_employee_app/view/chats/presentation/provider/chat_state.dart';
 import 'package:divine_employee_app/view/incidents/presentation/provider/select_date_time_provider_for_incident.dart';

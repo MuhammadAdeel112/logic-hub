@@ -54,7 +54,7 @@ class Job {
   String? imageUrl;
 
   List<Manager> manager;
-  Client client; // ✅ single object (not list)
+  Client client;
 
   Job({
     required this.id,
@@ -85,11 +85,14 @@ class Job {
     title: json["title"] ?? "",
     description: json["description"] ?? "",
     task: List<Task>.from((json["task"] ?? []).map((x) => Task.fromJson(x))),
-    startTime: DateTime.parse(json["startTime"]),
-    endTime: DateTime.parse(json["endTime"]),
-    address: Address.fromJson(json["address"]),
+    // Null safety for dates
+    startTime: json["startTime"] != null ? DateTime.parse(json["startTime"]) : DateTime.now(),
+    endTime: json["endTime"] != null ? DateTime.parse(json["endTime"]) : DateTime.now(),
+    address: json["address"] != null
+        ? Address.fromJson(json["address"])
+        : Address(formattedAddress: "", lat: 0, long: 0),
 
-    extraAmount: json["extraAmount"] ?? "0",
+    extraAmount: json["extraAmount"]?.toString() ?? "0",
     extraDistance: json["extraDistance"] ?? 0,
     allowances: json["allowances"] ?? 0,
     extraHours: json["extrahours"] ?? 0,
@@ -98,17 +101,16 @@ class Job {
     status: json["status"] ?? "",
     shift: json["shift"] ?? "",
 
-    clockin: json["clockin"] == null ? null : DateTime.parse(json["clockin"]),
-    clockout:
-    json["clockout"] == null ? null : DateTime.parse(json["clockout"]),
+    clockin: json["clockin"] == null ? null : DateTime.tryParse(json["clockin"].toString()),
+    clockout: json["clockout"] == null ? null : DateTime.tryParse(json["clockout"].toString()),
     jobNotes: json["jobNotes"],
     managerRemarks: json["managerRemarks"],
     imageUrl: json["imageUrl"],
 
-    manager:
-    List<Manager>.from((json["manager"] ?? []).map((x) => Manager.fromJson(x))),
+    manager: List<Manager>.from((json["manager"] ?? []).map((x) => Manager.fromJson(x))),
 
-    client: Client.fromJson(json["client"]),
+    // Safety for client object
+    client: Client.fromJson(json["client"] ?? {}),
   );
 
   Map<String, dynamic> toJson() => {
@@ -164,55 +166,42 @@ class Address {
 }
 
 // =============================================================
-// CLIENT MODEL (100% From Your API)
+// CLIENT MODEL (FIXED FOR NULL VALUES)
 // =============================================================
 class Client {
   String id;
   String managerId;
   String companyId;
-
   String firstName;
   String middleName;
   String lastName;
-
   DateTime dob;
   String mobile;
   String email;
   String password;
-
   String primaryLanguage;
   bool requiresInterpreter;
-
   Address address;
-
   String ndisNumber;
   String planManagementType;
-
   List<EmergencyContact> emergencyContact;
   GpDetails gpDetails;
-
   List<String> diagnosis;
   List<String> allergies;
   List<String> preferredCommunicationMethod;
-
   String livingArrangement;
   String goalsAndSupportNeeds;
-
   RiskAssessment riskAssessment;
-
   String profileImage;
   String medicareNumber;
   String medicareExpiry;
   String pensionNumber;
   String pensionType;
   String pensionExpiry;
-
   List<SupportingAgency> supportingAgencies;
-
   String formCompletedBy;
   DateTime completionDate;
   List<String> pronouns;
-
   DateTime createdAt;
   DateTime updatedAt;
   int v;
@@ -263,35 +252,39 @@ class Client {
     firstName: json["firstName"] ?? "",
     middleName: json["middleName"] ?? "",
     lastName: json["lastName"] ?? "",
-    dob: DateTime.parse(json["dob"]),
+    // Safe DateTime parsing
+    dob: json["dob"] != null ? DateTime.parse(json["dob"]) : DateTime.now(),
     mobile: json["mobile"] ?? "",
     email: json["email"] ?? "",
     password: json["password"] ?? "",
     primaryLanguage: json["primaryLanguage"] ?? "",
     requiresInterpreter: json["requiresInterpreter"] ?? false,
-    address: Address.fromJson(json["address"]),
+    address: json["address"] != null
+        ? Address.fromJson(json["address"])
+        : Address(formattedAddress: "", lat: 0, long: 0),
     ndisNumber: json["ndisNumber"] ?? "",
     planManagementType: json["planManagementType"] ?? "",
 
     emergencyContact: List<EmergencyContact>.from(
-      (json["emergencyContact"] ?? [])
-          .map((x) => EmergencyContact.fromJson(x)),
+      (json["emergencyContact"] ?? []).map((x) => EmergencyContact.fromJson(x)),
     ),
 
-    gpDetails: GpDetails.fromJson(json["gpDetails"]),
+    // FIX: gpDetails null check
+    gpDetails: json["gpDetails"] != null
+        ? GpDetails.fromJson(json["gpDetails"])
+        : GpDetails(name: "", phone: "", email: "", practiceAddress: "", practiceName: ""),
 
-    diagnosis:
-    List<String>.from((json["diagnosis"] ?? []).map((x) => x.toString())),
-    allergies:
-    List<String>.from((json["allergies"] ?? []).map((x) => x.toString())),
-    preferredCommunicationMethod: List<String>.from(
-        (json["preferredCommunicationMethod"] ?? [])
-            .map((x) => x.toString())),
+    diagnosis: List<String>.from((json["diagnosis"] ?? []).map((x) => x.toString())),
+    allergies: List<String>.from((json["allergies"] ?? []).map((x) => x.toString())),
+    preferredCommunicationMethod: List<String>.from((json["preferredCommunicationMethod"] ?? []).map((x) => x.toString())),
 
     livingArrangement: json["livingArrangement"] ?? "",
     goalsAndSupportNeeds: json["goalsAndSupportNeeds"] ?? "",
 
-    riskAssessment: RiskAssessment.fromJson(json["riskAssessment"]),
+    // FIX: riskAssessment null check
+    riskAssessment: json["riskAssessment"] != null
+        ? RiskAssessment.fromJson(json["riskAssessment"])
+        : RiskAssessment(aggressionOrViolence: "", wanderingOrAbsconding: "", mentalHealthConcerns: ""),
 
     profileImage: json["profileImage"] ?? "",
     medicareNumber: json["medicareNumber"] ?? "",
@@ -300,18 +293,17 @@ class Client {
     pensionType: json["pensionType"] ?? "",
     pensionExpiry: json["pensionExpiry"] ?? "",
 
-    supportingAgencies: List<SupportingAgency>.from(
-      (json["supportingAgencies"] ?? [])
-          .map((x) => SupportingAgency.fromJson(x)),
-    ),
+    // FIX: supportingAgencies null check
+    supportingAgencies: json["supportingAgencies"] != null
+        ? List<SupportingAgency>.from(json["supportingAgencies"].map((x) => SupportingAgency.fromJson(x)))
+        : [],
 
     formCompletedBy: json["formCompletedBy"] ?? "",
-    completionDate: DateTime.parse(json["completionDate"]),
-    pronouns:
-    List<String>.from((json["pronouns"] ?? []).map((x) => x.toString())),
+    completionDate: json["completionDate"] != null ? DateTime.parse(json["completionDate"]) : DateTime.now(),
+    pronouns: List<String>.from((json["pronouns"] ?? []).map((x) => x.toString())),
 
-    createdAt: DateTime.parse(json["createdAt"]),
-    updatedAt: DateTime.parse(json["updatedAt"]),
+    createdAt: json["createdAt"] != null ? DateTime.parse(json["createdAt"]) : DateTime.now(),
+    updatedAt: json["updatedAt"] != null ? DateTime.parse(json["updatedAt"]) : DateTime.now(),
     v: json["__v"] ?? 0,
   );
 
@@ -331,8 +323,7 @@ class Client {
     "address": address.toJson(),
     "ndisNumber": ndisNumber,
     "planManagementType": planManagementType,
-    "emergencyContact":
-    List<dynamic>.from(emergencyContact.map((x) => x.toJson())),
+    "emergencyContact": List<dynamic>.from(emergencyContact.map((x) => x.toJson())),
     "gpDetails": gpDetails.toJson(),
     "diagnosis": diagnosis,
     "allergies": allergies,
@@ -346,8 +337,7 @@ class Client {
     "pensionNumber": pensionNumber,
     "pensionType": pensionType,
     "pensionExpiry": pensionExpiry,
-    "supportingAgencies":
-    List<dynamic>.from(supportingAgencies.map((x) => x.toJson())),
+    "supportingAgencies": List<dynamic>.from(supportingAgencies.map((x) => x.toJson())),
     "formCompletedBy": formCompletedBy,
     "completionDate": completionDate.toIso8601String(),
     "pronouns": pronouns,

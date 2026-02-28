@@ -947,6 +947,42 @@ class _GenerateIncidentWithoutCurrentJobScreentate
     return '$hour:$minute $period';
   }
 
+  // --- NEW METHOD TO CLEAR ALL DATA ---
+  void _clearAllData() {
+    // 1. Clear Text Controller
+    descriptionController.clear();
+
+    // 2. Clear Providers (Image & Dropdowns)
+    final imageProvider =
+    Provider.of<IncidentImageProviderClass>(context, listen: false);
+    imageProvider.setIncidentImagePath(null);
+
+    final incidentTypeProvider =
+    Provider.of<SelectIncidentTypeProvider>(context, listen: false);
+    final actionProvider =
+    Provider.of<ActionTakenByStaffProvider>(context, listen: false);
+
+    // IMPORTANT: Since 'type' variable does not have a setter, please find the method
+    // in your provider class that sets the type. It is likely named setType() or resetType().
+    // If you cannot find it, create a method inside SelectIncidentTypeProvider:
+    // void reset() { _type = 'Select'; notifyListeners(); }
+
+    // Uncomment the lines below and replace 'methodName' with the actual method name:
+    // incidentTypeProvider.methodName('Select'); // <--- CHANGE THIS
+    // actionProvider.methodName('Select');     // <--- CHANGE THIS
+
+    // 3. Clear Local State Variables
+    setState(() {
+      JobId = null;
+      clientName = null;
+      shiftManagerName = null;
+      shiftManagerDesignation = null;
+      location = null;
+      isSelected = false; // Reset so dialog pops up again next time
+    });
+  }
+  // ------------------------------------
+
   void _showResultDialog(
       BuildContext context, Future<Map<String, dynamic>> future) {
     final currentTabProvider =
@@ -975,10 +1011,14 @@ class _GenerateIncidentWithoutCurrentJobScreentate
                     onpress: () {
                       Navigator.of(context).pop();
 
+                      // --- ADDED CLEAR DATA CALL ---
+                      if (success) {
+                        _clearAllData();
+                      }
+                      // ---------------------------
+
                       currentTabProvider.setCurrentScreen(JobHomeScreen());
                       currentTabProvider.setCurrentTab(2);
-                      // Navigator.push(context,
-                      //     SlideTransitionPage(page: ReportedIncidentsScreen()));
                     },
                     width: MediaQuery.of(context).size.width / 4,
                     title: 'Ok',
@@ -992,15 +1032,24 @@ class _GenerateIncidentWithoutCurrentJobScreentate
     );
   }
 
+  // --- UPDATED METHOD WITH BUILT-IN COMPRESSION ---
   Future<void> _pickImage(ImageSource source) async {
     final status = await _requestPermission(source);
     if (status == PermissionStatus.granted) {
-      final pickedFile = await ImagePicker().pickImage(source: source);
+
+      // Image built-in compression
+      final pickedFile = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 60,
+        maxWidth: 1920,
+      );
+
       if (pickedFile != null) {
         final imageProvider =
         Provider.of<IncidentImageProviderClass>(context, listen: false);
         imageProvider.setIncidentImagePath(pickedFile.path);
       }
+
     } else {
       Utils.showFlushbar(
           '${_getPermissionName(source)} permission not granted', context);
@@ -1008,6 +1057,7 @@ class _GenerateIncidentWithoutCurrentJobScreentate
       print('${_getPermissionName(source)} permission not granted');
     }
   }
+  // ---------------------------------------
 
   Future<PermissionStatus> _requestPermission(ImageSource source) async {
     if (source == ImageSource.camera) {

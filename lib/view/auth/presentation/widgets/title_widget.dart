@@ -1,4 +1,3 @@
-
 import 'package:divine_employee_app/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +15,7 @@ class TitleWidget extends StatelessWidget {
             top: 46.0,
           ),
           child: Center(
-            child: Text('DIVINE SUPPORT CARE',
+            child: Text('DIVINE SOFTWARE',
                 style: AppConstants.headlineTextStyleBlack),
           ),
         ),

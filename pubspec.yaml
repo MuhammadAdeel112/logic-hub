@@ -6,7 +6,8 @@ description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # Project version (build number included for iOS)
-version: 1.0.8+11   # for ios
+version: 1.0.9+12
+   # for ios
 
 # SDK environment constraints
 environment:
@@ -20,6 +21,7 @@ dependencies:
   # iOS style icons
   cupertino_icons: ^1.0.2
 
+  flutter_image_compress: ^2.1.0
   # SVG support
   flutter_svg: ^2.0.7
 
@@ -51,7 +53,7 @@ dependencies:
   http: ^1.1.0
 
   # Local storage
-  shared_preferences: ^2.2.1
+  shared_preferences: ^2.2.2
 
   # Image picker from gallery/camera
   image_picker: ^1.0.4

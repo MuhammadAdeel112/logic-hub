@@ -9,7 +9,8 @@ import 'package:divine_employee_app/view/jobs/presentation/screens/completed_job
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../availability/presentation/screens/requested_availbility_details_screen.dart';
+// Note: Agar formatDateTime function kisi aur file mein hai to usay import kar len
+// Main yahan local define kar raha hun agar missing ho to.
 
 class AllAlertsScreen extends StatefulWidget {
   const AllAlertsScreen({Key? key}) : super(key: key);
@@ -44,77 +45,84 @@ class _AllAlertsScreenState extends State<AllAlertsScreen> {
           return Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: generalProvider.isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : generalProvider.notifications.isEmpty
-                    ? Center(child: Text('No notifications available.'))
-                    : RefreshIndicator(
-                        onRefresh: _refreshNotifications,
-                        child: ListView.builder(
-                          itemCount: generalProvider.notifications.length,
-                          itemBuilder: (context, index) {
-                            // final notification =
-                            //     generalProvider.notifications[index];
-                            final reversedIndex =
-                                generalProvider.notifications.length -
-                                    1 -
-                                    index;
-                            final notification =
-                                generalProvider.notifications[reversedIndex];
-                            return InkWell(
-                              onTap: () async {
-                                getMeToScreen(notification.type);
-                                await generalProvider
-                                    .updateNotificationStatus(notification.id);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  padding: EdgeInsets.all(4),
-                                  decoration: ShapeDecoration(
-                                    color: AppConstants.kcwhiteColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                  child: ListTile(
-                                    title: Text(notification.title),
-                                    subtitle: Text(notification.body),
-                                    leading: notification.isRead == false
-                                        ? Icon(
-                                            Icons.circle,
-                                            color: AppConstants.kcprimaryColor,
-                                          )
-                                        : SizedBox(),
-                                    trailing: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(formatDateTime(
-                                            notification.createdAt)),
-                                        Text(
-                                            formatDate(notification.createdAt)),
-                                      ],
-                                    ),
-                                    titleTextStyle:
-                                        AppConstants.kTextStyleMediumBoldBlack,
-                                    subtitleTextStyle:
-                                        AppConstants.kTextStyleSmallBoldGrey,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                ? const Center(child: Text('No notifications available.'))
+                : RefreshIndicator(
+              onRefresh: _refreshNotifications,
+              child: ListView.builder(
+                itemCount: generalProvider.notifications.length,
+                itemBuilder: (context, index) {
+                  final reversedIndex =
+                      generalProvider.notifications.length -
+                          1 -
+                          index;
+                  final notification =
+                  generalProvider.notifications[reversedIndex];
+                  return InkWell(
+                    onTap: () async {
+                      getMeToScreen(notification.type);
+                      await generalProvider
+                          .updateNotificationStatus(notification.id);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: ShapeDecoration(
+                          color: AppConstants.kcwhiteColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: ListTile(
+                          title: Text(notification.title),
+                          subtitle: Text(notification.body),
+                          leading: notification.isRead == false
+                              ? Icon(
+                            Icons.circle,
+                            color: AppConstants.kcprimaryColor,
+                            size: 12,
+                          )
+                              : const SizedBox(),
+                          trailing: Column(
+                            mainAxisAlignment:
+                            MainAxisAlignment.center,
+                            children: [
+                              // Fixed: added null check using ! or providing default
+                              Text(notification.createdAt != null
+                                  ? formatDateTime(notification.createdAt!)
+                                  : ""),
+                              Text(notification.createdAt != null
+                                  ? formatDate(notification.createdAt!)
+                                  : ""),
+                            ],
+                          ),
+                          titleTextStyle:
+                          AppConstants.kTextStyleMediumBoldBlack,
+                          subtitleTextStyle:
+                          AppConstants.kTextStyleSmallBoldGrey,
                         ),
                       ),
+                    ),
+                  );
+                },
+              ),
+            ),
           );
         },
       ),
     );
   }
 
+  // Formatting functions
   String formatDate(DateTime date) {
-    // Format the date manually (without intl)
     return '${date.year}-${_twoDigits(date.month)}-${_twoDigits(date.day)}';
+  }
+
+  // Agar formatDateTime global nahi hai to ye yahan kaam karega
+  String formatDateTime(DateTime date) {
+    return '${_twoDigits(date.hour)}:${_twoDigits(date.minute)}';
   }
 
   String _twoDigits(int n) {
@@ -135,18 +143,18 @@ class _AllAlertsScreenState extends State<AllAlertsScreen> {
           context,
           SlideTransitionPage(
               page: CompletedJobsScreen(
-            animateTo: 1,
-          )));
+                animateTo: 1,
+              )));
     } else if (type == 'Task_employee') {
       Navigator.push(context, SlideTransitionPage(page: AssignedJobScreen()));
     } else if (type == 'leave_status') {
     } else if (type == 'leave_delete') {
     } else if (type == 'availibilty_request_accept') {
       Navigator.push(
-          context, SlideTransitionPage(page: AvailabilityDashboard()));
+          context, SlideTransitionPage(page: const AvailabilityDashboard()));
     } else if (type == 'availibilty_request_reject') {
       Navigator.push(
-          context, SlideTransitionPage(page: AvailabilityDashboard()));
+          context, SlideTransitionPage(page: const AvailabilityDashboard()));
     } else if (type == 'Documnet_approved') {
       Navigator.push(context, SlideTransitionPage(page: DocumentsDashboard()));
     } else if (type == 'Documnet_rejected') {
@@ -154,8 +162,8 @@ class _AllAlertsScreenState extends State<AllAlertsScreen> {
           context,
           SlideTransitionPage(
               page: DocumentsDashboard(
-            animateTo: 1,
-          )));
+                animateTo: 1,
+              )));
     } else {}
   }
 }

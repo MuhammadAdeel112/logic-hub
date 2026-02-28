@@ -19,9 +19,17 @@ class FeedBackScreen extends StatelessWidget {
   final TextEditingController phoneTextController = TextEditingController();
   final TextEditingController emailTextController = TextEditingController();
   final TextEditingController additionalFeedbackTextController =
-      TextEditingController();
+  TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    // 🔥 Light Grey Hint Style define kiya taake bar bar use ho sake
+    final TextStyle lightHintStyle = TextStyle(
+      color: Colors.grey.withOpacity(0.5),
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+    );
+
     return ReuseableScaffoldScreen(
       appBarTitle: 'Feedback',
       content: Center(
@@ -51,7 +59,6 @@ class FeedBackScreen extends StatelessWidget {
                               style: AppConstants.kTextStyleMediumBoldBlack,
                             ),
                             Container(
-                              // height: MediaQuery.of(context).size.height / 16,
                               width: MediaQuery.of(context).size.width / 2.5,
                               decoration: ShapeDecoration(
                                 color: AppConstants.kcwhiteColor,
@@ -62,18 +69,14 @@ class FeedBackScreen extends StatelessWidget {
                               ),
                               child: Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: Center(
                                   child: TextFormField(
                                     controller: nameTextController,
                                     decoration: InputDecoration(
                                       hintText: "Enter Your Name",
-                                      hintStyle:
-                                          AppConstants.kTextStyleSmallBoldGrey,
+                                      hintStyle: lightHintStyle, // 🔥 Fixed: Light Grey
                                       border: InputBorder.none,
-                                      //  prefixIcon: Icon(
-                                      //    Icons.person,
-                                      //  ),
                                     ),
                                   ),
                                 ),
@@ -84,18 +87,17 @@ class FeedBackScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            //Staff Name
+                            // Phone Number
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   'Phone Number',
-                                  style: AppConstants.kTextStyleMediumBoldGrey,
+                                  style: AppConstants.kTextStyleMediumBoldBlack, // 🔥 Consistency
                                 ),
                                 Container(
-                                  // height: MediaQuery.of(context).size.height / 16,
                                   width:
-                                      MediaQuery.of(context).size.width / 2.5,
+                                  MediaQuery.of(context).size.width / 2.5,
                                   decoration: ShapeDecoration(
                                     color: AppConstants.kcwhiteColor,
                                     shape: RoundedRectangleBorder(
@@ -112,12 +114,8 @@ class FeedBackScreen extends StatelessWidget {
                                         controller: phoneTextController,
                                         decoration: InputDecoration(
                                           hintText: "+61 123 123 123",
-                                          hintStyle: AppConstants
-                                              .kTextStyleSmallBoldGrey,
+                                          hintStyle: lightHintStyle, // 🔥 Fixed: Light Grey
                                           border: InputBorder.none,
-                                          //  prefixIcon: Icon(
-                                          //    Icons.person,
-                                          //  ),
                                         ),
                                       ),
                                     ),
@@ -129,7 +127,7 @@ class FeedBackScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Divider(
+                    const Divider(
                       color: Colors.transparent,
                     ),
                     Column(
@@ -137,11 +135,9 @@ class FeedBackScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Email',
-                          style: AppConstants.kTextStyleMediumBoldGrey,
+                          style: AppConstants.kTextStyleMediumBoldBlack, // 🔥 Consistency
                         ),
                         Container(
-                          // height: MediaQuery.of(context).size.height / 16,
-                          // width: MediaQuery.of(context).size.width / 2.5,
                           decoration: ShapeDecoration(
                             color: AppConstants.kcwhiteColor,
                             shape: RoundedRectangleBorder(
@@ -151,19 +147,15 @@ class FeedBackScreen extends StatelessWidget {
                           ),
                           child: Padding(
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Center(
                               child: TextFormField(
                                 controller: emailTextController,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
                                   hintText: "example@gmail.com",
-                                  hintStyle:
-                                      AppConstants.kTextStyleSmallBoldGrey,
+                                  hintStyle: lightHintStyle, // 🔥 Fixed: Light Grey
                                   border: InputBorder.none,
-                                  //  prefixIcon: Icon(
-                                  //    Icons.person,
-                                  //  ),
                                 ),
                               ),
                             ),
@@ -171,7 +163,7 @@ class FeedBackScreen extends StatelessWidget {
                         )
                       ],
                     ),
-                    Divider(
+                    const Divider(
                       color: Colors.transparent,
                     ),
                     Column(
@@ -179,13 +171,10 @@ class FeedBackScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Additional Feedback',
-                          style: AppConstants.kTextStyleMediumBoldGrey,
+                          style: AppConstants.kTextStyleMediumBoldBlack, // 🔥 Consistency
                         ),
                         Container(
                           height: MediaQuery.of(context).size.height / 7,
-                          // height: 94,
-
-                          // width: MediaQuery.of(context).size.width / 3,
                           decoration: ShapeDecoration(
                             color: AppConstants.kcwhiteColor,
                             shape: RoundedRectangleBorder(
@@ -195,28 +184,26 @@ class FeedBackScreen extends StatelessWidget {
                           ),
                           child: Padding(
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
                             child: TextFormField(
                               controller: additionalFeedbackTextController,
                               maxLines: 5,
+                              textAlignVertical: TextAlignVertical.top, // 🔥 Hint top se start hoga
                               decoration: InputDecoration(
                                 hintText:
-                                    "If you have any additional feedback, please type it in here...",
-                                hintStyle: AppConstants.kTextStyleSmallBoldGrey,
+                                "If you have any additional feedback, please type it in here...",
+                                hintStyle: lightHintStyle, // 🔥 Fixed: Light Grey
                                 border: InputBorder.none,
-                                //  prefixIcon: Icon(
-                                //    Icons.person,
-                                //  ),
                               ),
                             ),
                           ),
                         )
                       ],
                     ),
-                    Divider(
+                    const Divider(
                       color: Colors.transparent,
                     ),
-                    Divider(
+                    const Divider(
                       color: Colors.transparent,
                     ),
                     Consumer<FeedbackApiProvider>(
@@ -224,43 +211,36 @@ class FeedBackScreen extends StatelessWidget {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            SizedBox(),
+                            const SizedBox(),
                             feedbackProvider.isLoading == true
-                                ? Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: CircularProgressIndicator(),
-                                  )
+                                ? const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: CircularProgressIndicator(),
+                            )
                                 : ReuseableGradientButton(
-                                    title: 'Submit Feedback',
-                                    onpress: () async {
-                                      // Set loading to true when the button is pressed
-                                      await feedbackProvider.submitFeedback(
-                                        nameTextController.text,
-                                        emailTextController.text,
-                                        phoneTextController.text,
-                                        additionalFeedbackTextController.text,
-                                      );
+                              title: 'Submit Feedback',
+                              onpress: () async {
+                                await feedbackProvider.submitFeedback(
+                                  nameTextController.text,
+                                  emailTextController.text,
+                                  phoneTextController.text,
+                                  additionalFeedbackTextController.text,
+                                );
 
-                                      // Handle the result after feedback submission
-                                      Map<String, dynamic> result =
-                                          await feedbackProvider
-                                              .feedbackRequestFuture;
+                                Map<String, dynamic> result =
+                                await feedbackProvider
+                                    .feedbackRequestFuture;
 
-                                      if (result['success']) {
-                                        // If successful, handle the result
-                                        print(result['message']);
-                                        _showCustomAlertDialog(context);
-
-                                        // Navigate to the next screen or show a success message
-                                      } else {
-                                        // Handle the error
-                                        Utils.showFlushbar(
-                                            result['message'], context);
-                                        print(result['message']);
-                                        // Show an error message or take appropriate action
-                                      }
-                                    },
-                                  ),
+                                if (result['success']) {
+                                  print(result['message']);
+                                  _showCustomAlertDialog(context);
+                                } else {
+                                  Utils.showFlushbar(
+                                      result['message'], context);
+                                  print(result['message']);
+                                }
+                              },
+                            ),
                           ],
                         );
                       },
@@ -286,10 +266,7 @@ void _showCustomAlertDialog(BuildContext context) {
           iconDone: true,
           title: 'Feedback Submitted!',
           subtitle:
-              'Thank you for sharing your feedback. Your input matters and helps us improve.',
-          // onCancel: () {
-          //   Navigator.of(context).pop(); // Close the dialog
-          // },
+          'Thank you for sharing your feedback. Your input matters and helps us improve.',
           rightButtonTitle: 'Done',
           leftButtonTitle: '',
           onConfirm: () {

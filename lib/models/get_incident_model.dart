@@ -1,4 +1,3 @@
-
 class GetIncidentModel {
   final String id;
   final String jobId;
@@ -11,7 +10,7 @@ class GetIncidentModel {
   final DateTime time;
   final String type;
   final String action;
-  final String imageUrl;
+  final String? imageUrl; // 🔥 Isay Optional (?) kiya kyunke JSON mein null aa raha hai
 
   GetIncidentModel({
     required this.id,
@@ -25,23 +24,24 @@ class GetIncidentModel {
     required this.time,
     required this.type,
     required this.action,
-    required this.imageUrl,
+    this.imageUrl, // 🔥 Required hata diya
   });
 
   factory GetIncidentModel.fromJson(Map<String, dynamic> json) {
     return GetIncidentModel(
-      id: json['_id'],
-      jobId: json['jobId'],
-      employeeId: json['employeeId'],
-      clientName: json['clientName'],
-      staffName: json['staffName'],
-      staffDesignation: json['staffDesignation'],
-      location: json['location'],
-      description: json['description'],
-      time: DateTime.parse(json['time']),
-      type: json['type'],
-      action: json['action'],
-      imageUrl: json['imageUrl'],
+      id: json['_id'] ?? '',
+      jobId: json['jobId'] ?? '',
+      employeeId: json['employeeId'] ?? '',
+      clientName: json['clientName'] ?? 'N/A',
+      staffName: json['staffName'] ?? 'N/A',
+      staffDesignation: json['staffDesignation'] ?? 'N/A',
+      location: json['location'] ?? 'N/A',
+      description: json['description'] ?? '',
+      // 🔥 Date parsing ko safe banaya
+      time: json['time'] != null ? DateTime.parse(json['time']) : DateTime.now(),
+      type: json['type'] ?? 'Other',
+      action: json['action'] ?? 'N/A',
+      imageUrl: json['imageUrl'], // Ye ab null handle kar lega
     );
   }
 }

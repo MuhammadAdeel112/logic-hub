@@ -28,18 +28,27 @@ android {
         jvmTarget = "1.8"
     }
 
+    // ✅ SIGNING CONFIG
+    signingConfigs {
+        create("release") {
+            storeFile = file("divine_employee_app.jks")
+            storePassword = "123456"
+            keyAlias = "upload"
+            keyPassword = "123456"
+        }
+    }
+
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
 
 dependencies {
-    // Core library desugaring for plugins that require Java 8 APIs
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
-
-    // Kotlin & AndroidX dependencies
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")

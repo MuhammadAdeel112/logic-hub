@@ -16,8 +16,9 @@ class GetAllNotificationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  List<Notifcation> _notifications = [];
-  List<Notifcation> get notifications => _notifications;
+  // Error Fix: Notifcation ko NotificationItem se badal diya
+  List<NotificationItem> _notifications = [];
+  List<NotificationItem> get notifications => _notifications;
 
   Future<AllNotificationsModel> fetchAllNotifications() async {
     var token = await SessionHandlingViewModel().getToken();
@@ -27,28 +28,31 @@ class GetAllNotificationProvider with ChangeNotifier {
       var url = Uri.parse(ApiEndPoints.allNotifications);
 
       var response =
-          await http.get(url, headers: {'x-auth-token': token ?? ''});
+      await http.get(url, headers: {'x-auth-token': token ?? ''});
 
       if (response.statusCode == 200) {
         print(response.body);
 
         final allNotificationsModel =
-            allNotificationsModelFromJson(response.body);
-        _notifications = allNotificationsModel.notifcation;
+        allNotificationsModelFromJson(response.body);
+
+        // Error Fix: .notifcation ko .notifications kar diya
+        _notifications = allNotificationsModel.notifications;
         notifyListeners();
 
         return allNotificationsModel;
       } else {
         if (kDebugMode)
           print(
-              "Error: Fetching  All Manager with status code ${response.statusCode}.");
+              "Error: Fetching All Manager with status code ${response.statusCode}.");
       }
     } catch (e) {
       if (kDebugMode) print("Error: Fetching All Manager: ${e.toString()}");
     } finally {
       setLoadingState(false);
     }
-    throw (e);
+    // Fixed: throw syntax (pehle variable 'e' define hona chahiye catch block mein)
+    throw Exception("Failed to load notifications");
   }
 
   Future<void> updateNotificationStatus(String notificationId) async {
@@ -56,9 +60,9 @@ class GetAllNotificationProvider with ChangeNotifier {
       var token = await SessionHandlingViewModel().getToken();
 
       var url =
-          Uri.parse(ApiEndPoints.updateNotificationStatus(notificationId));
+      Uri.parse(ApiEndPoints.updateNotificationStatus(notificationId));
       var response =
-          await http.put(url, headers: {'x-auth-token': token ?? ''});
+      await http.put(url, headers: {'x-auth-token': token ?? ''});
 
       if (response.statusCode == 200) {
         // Update the local list of notifications

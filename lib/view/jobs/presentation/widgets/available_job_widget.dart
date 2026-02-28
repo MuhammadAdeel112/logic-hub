@@ -23,7 +23,6 @@ class AvailableJobWidget extends StatefulWidget {
 class _AvailableJobWidgetState extends State<AvailableJobWidget> {
   bool isLoading = false;
 
-  // 🔥 FIX — convert ID to string always
   String get lastSixJobId {
     final jobId = widget.jobData.id.toString();
     if (jobId.length >= 6) {
@@ -66,7 +65,7 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
     final String shiftType = widget.jobData.shift;
     final dynamic allowances = widget.jobData.allowances;
 
-    // 🔥 FIX: ensure jobId is String
+    // 🔥 Zaroori: jobId ko hamesha string mein rakhein comparison ke liye
     final String jobId = widget.jobData.id.toString();
 
     final clientInfoForAvailableJobs = widget.jobData;
@@ -88,7 +87,6 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --------------------- Row 1 ---------------------
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -103,8 +101,6 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
                       style: AppConstants.kTextStyleMediumBoldBlack,
                     ),
                     const SizedBox(height: 2),
-
-                    // 🔥 FIXED JOB ID (Assigned Jobs style)
                     Text(
                       "Job ID: $lastSixJobId",
                       style: AppConstants
@@ -156,7 +152,6 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
 
           const SizedBox(height: 10),
 
-          // --------------------- Row 2 ---------------------
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -175,7 +170,6 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
 
           const SizedBox(height: 10),
 
-          // --------------------- Description ---------------------
           Text(
             taskDescription,
             maxLines: 2,
@@ -185,7 +179,6 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
 
           const Divider(),
 
-          // --------------------- Phone ---------------------
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -208,7 +201,6 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
                 ),
               ),
 
-              // Shift Type
               shiftType == 'day'
                   ? Row(
                 children: [
@@ -247,7 +239,6 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
 
           const SizedBox(height: 10),
 
-          // --------------------- Location + Apply ---------------------
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -275,20 +266,19 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
 
               Consumer<JobApplicationProvider>(
                 builder: (context, value, child) {
+                  // 🔥 Ab ye Provider ke SharedPreferences wale data se sync ho gaya hai
+                  bool isApplied = value.isJobApplied(jobId);
+
                   return isLoading
                       ? const CircularProgressIndicator()
                       : ReuseableSmallButton(
-                    text: 'Apply Now',
+                    text: isApplied ? 'Applied' : 'Apply Now',
                     textStyle: AppConstants.kTextStyleSmallBoldGreen,
-                    bgColor: AppConstants.kcgreenbgColor,
-                    onpress: () async {
-                      setState(() => isLoading = true);
+                    bgColor: isApplied ? Colors.grey.shade300 : AppConstants.kcgreenbgColor,
 
-                      await value.submitJobApplication(jobId);
-                      _showResultDialog(
-                          context, value.jobApplicationFuture);
-
-                      setState(() => isLoading = false);
+                    // Click disable if already applied
+                    onpress: isApplied ? () {} : () {
+                      _handleApplyClick(value, jobId);
                     },
                   );
                 },
@@ -300,11 +290,21 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
     );
   }
 
-  // ------------------- Result Dialog -------------------
+  void _handleApplyClick(JobApplicationProvider value, String jobId) async {
+    setState(() => isLoading = true);
+
+    await value.submitJobApplication(jobId);
+
+    _showResultDialog(context, value.jobApplicationFuture);
+
+    if (mounted) setState(() => isLoading = false);
+  }
+
   void _showResultDialog(
       BuildContext context, Future<Map<String, dynamic>> future) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return FutureBuilder<Map<String, dynamic>>(
           future: future,
@@ -312,12 +312,11 @@ class _AvailableJobWidgetState extends State<AvailableJobWidget> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const AlertDialog(
                 title: Text('Submitting...'),
-                content: CircularProgressIndicator(),
+                content: SizedBox(height: 40, child: Center(child: CircularProgressIndicator())),
               );
             } else {
               bool success = snapshot.data?['success'] ?? false;
-              String message =
-                  snapshot.data?['message'] ?? 'Unknown error';
+              String message = snapshot.data?['message'] ?? 'Unknown error';
 
               return AlertDialog(
                 title: Text(success ? 'Success' : 'Error'),
