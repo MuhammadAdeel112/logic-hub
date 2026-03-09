@@ -39,7 +39,10 @@ class _ScanQrCodeState extends State<ScanQrCode> {
   var provider;
 
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  late QRViewController controller;
+
+  // ✅ FIX 1: Changed from `late` to nullable — prevents LateInitializationError
+  QRViewController? controller;
+
   late String scannedValue;
   String message = 'Scanning...';
   bool isSccaned = false;
@@ -55,53 +58,54 @@ class _ScanQrCodeState extends State<ScanQrCode> {
       appBarTitle: 'Scan Qr Code at Job',
       content: !_manualInputMode
           ? Column(
-              children: [
-                Container(
-                    height: MediaQuery.of(context).size.height / 2,
-                    child: QRView(
-                      key: qrKey,
-                      onQRViewCreated: _onQRViewCreated,
-                    )),
-                Divider(
-                  color: Colors.transparent,
-                ),
-                Text(
-                  message,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Divider(
-                  color: Colors.transparent,
-                ),
-                provider.isLoading
-                    ? CircularProgressIndicator()
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ReuseableGradientSmallButton(
-                              title: 'Re-Scan',
-                              onpress: () {
-                                // Reset the message and allow re-scan
-                                controller.resumeCamera();
-                                setState(() {
-                                  message = 'Scanning...';
-                                  scannedValue = '';
-                                });
-                              }),
-                          ReuseableGradientSmallButton(
-                            onpress: () {
-                              setState(() {
-                                _manualInputMode = !_manualInputMode;
-                              });
-                            },
-                            title: _manualInputMode
-                                ? 'Switch to Scan'
-                                : 'Enter Code Manually',
-                          ),
-                        ],
-                      ),
-              ],
-            )
+        children: [
+          Container(
+              height: MediaQuery.of(context).size.height / 2,
+              child: QRView(
+                key: qrKey,
+                onQRViewCreated: _onQRViewCreated,
+              )),
+          Divider(
+            color: Colors.transparent,
+          ),
+          Text(
+            message,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Divider(
+            color: Colors.transparent,
+          ),
+          provider.isLoading
+              ? CircularProgressIndicator()
+              : Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ReuseableGradientSmallButton(
+                  title: 'Re-Scan',
+                  onpress: () {
+                    // ✅ FIX 2: Null-safe call + reset isSccaned flag
+                    controller?.resumeCamera();
+                    setState(() {
+                      message = 'Scanning...';
+                      scannedValue = '';
+                      isSccaned = false;
+                    });
+                  }),
+              ReuseableGradientSmallButton(
+                onpress: () {
+                  setState(() {
+                    _manualInputMode = !_manualInputMode;
+                  });
+                },
+                title: _manualInputMode
+                    ? 'Switch to Scan'
+                    : 'Enter Code Manually',
+              ),
+            ],
+          ),
+        ],
+      )
           : _buildManualInputForm(),
     );
   }
@@ -112,84 +116,76 @@ class _ScanQrCodeState extends State<ScanQrCode> {
     });
 
     controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        isSccaned = true;
-        scannedValue = scanData.code!;
-        _handleScannedValue(scannedValue);
-      });
+      // ✅ FIX 3: Guard against multiple triggers from same scan
+      if (!isSccaned) {
+        setState(() {
+          isSccaned = true;
+          scannedValue = scanData.code ?? '';
+          _handleScannedValue(scannedValue);
+        });
+      }
     });
   }
 
   Widget _buildManualInputForm() {
     return _manualInputMode
         ? Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: _textEditingController,
-                  decoration: InputDecoration(labelText: 'Enter Code Manually'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter code';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 10),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ReuseableGradientSmallButton(
-                      onpress: () {
-                        String lastFourCharacters = widget.cilentId
-                            .substring(widget.cilentId.length - 4);
-                        String restOfTheString = widget.cilentId
-                            .substring(0, widget.cilentId.length - 4);
-
-                        // print(
-                        //     "Last four characters of the employee ID: $lastFourCharacters");
-                        // print("Rest of the employee ID: $restOfTheString");
-
-                        if (_formKey.currentState!.validate()) {
-                          _handleScannedValue(
-                              restOfTheString + _textEditingController.text);
-                        }
-                      },
-                      title: 'Submit',
-                    ),
-                    ReuseableGradientSmallButton(
-                      onpress: () {
-                        setState(() {
-                          _manualInputMode = !_manualInputMode;
-                        });
-                      },
-                      title: _manualInputMode
-                          ? 'Switch to Scan'
-                          : 'Switch to Manual',
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _textEditingController,
+            decoration: InputDecoration(labelText: 'Enter Code Manually'),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter the full code';
+              }
+              return null;
+            },
+          ),
+          SizedBox(height: 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ReuseableGradientSmallButton(
+                title: 'Submit',
+                onpress: () {
+                  if (_formKey.currentState!.validate()) {
+                    // Clock-out jaisa simple logic: pura typed code direct compare
+                    _handleScannedValue(_textEditingController.text.trim());
+                  }
+                },
+              ),
+              ReuseableGradientSmallButton(
+                onpress: () {
+                  setState(() {
+                    _manualInputMode = !_manualInputMode;
+                  });
+                },
+                title: _manualInputMode
+                    ? 'Switch to Scan'
+                    : 'Enter Code Manually',
+              ),
+            ],
+          ),
+        ],
+      ),
+    )
         : SizedBox();
   }
 
   void _handleScannedValue(String value) {
-    // Add your custom logic based on the scanned value
     if (value.isNotEmpty) {
-      // Successfully scanned
       setState(() {
-        // message = 'Scanned value: $value';
         if (value == widget.cilentId) {
           if (widget.isClockIn) {
             message = 'Scanned Successfully. Wait for Clock In';
           } else {
             message = 'Scanned Successfully. Wait for Clock Out';
           }
-          controller.pauseCamera(); // Stop the camera after a successful scan
+          // ✅ FIX 4: Use safe wrapper instead of direct call
+          _pauseCameraSafely();
           if (widget.isClockIn == true) {
             clockIn(context);
           }
@@ -197,34 +193,37 @@ class _ScanQrCodeState extends State<ScanQrCode> {
             clockout();
           }
         } else {
-          controller.stopCamera();
+          // ✅ FIX 5: stopCamera() → pauseCamera() via safe wrapper (THIS was the crash cause)
+          _pauseCameraSafely();
           message =
-              'Scanned Failed. Re-Scan and if couldnot figure out please contact manager.';
+          'Scanned Failed. Re-Scan and if couldnot figure out please contact manager.';
 
           Utils.showFlushbar('Wrong Code. Try Again', context);
         }
       });
-
-      // Add additional logic here for success, if needed
     } else {
-      // Empty value, handle as an error
       setState(() {
         message = 'Error: Unable to read QR Code. Please try again.';
       });
+    }
+  }
 
-      // Add additional logic here for error, if needed
+  // ✅ FIX 6: Safe camera pause — catches any native-side errors silently
+  void _pauseCameraSafely() {
+    try {
+      controller?.pauseCamera();
+    } catch (e) {
+      debugPrint('Camera pause skipped: $e');
     }
   }
 
   clockIn(BuildContext context) async {
-    // Check if already loading to prevent multiple requests
     if (!provider.isLoading) {
       try {
-        provider.resetLoading(); // Reset loading state
+        provider.resetLoading();
         final result = await provider.submitClockInRequest(widget.JobId, context);
 
         if (result['success']) {
-          // If successful, navigate to the next screen
           final SharedPreferences sp = await SharedPreferences.getInstance();
           var i = await sp.setString('currentJobId', widget.JobId);
           print(' job id : ${i} which was stored in FFat clock in');
@@ -237,14 +236,12 @@ class _ScanQrCodeState extends State<ScanQrCode> {
               ));
           Utils.showFlushbar('Clock-In request Successful', context);
         } else {
-          // Handle the case where the clock-in request was not successful
-          // You might want to show an error message to the user
           Utils.showFlushbar(
               'Clock-In request failed: ${result['message']}', context);
           print('Clock-In request failed: ${result['message']}');
         }
       } finally {
-        provider.resetLoading(); // Reset loading state after the request
+        provider.resetLoading();
       }
     }
   }
@@ -253,11 +250,10 @@ class _ScanQrCodeState extends State<ScanQrCode> {
     final provider = Provider.of<ClockOutApiProvider>(context, listen: false);
     if (!provider.isLoading) {
       try {
-        final result = await provider.submitClockOutRequest(widget.JobId,context);
+        final result = await provider.submitClockOutRequest(widget.JobId, context);
 
         if (result['success']) {
           Provider.of<WorkProvider>(context, listen: false).clockOut();
-          // If successful, navigate to the next screen
           Navigator.push(
               context,
               SlideTransitionPage(
@@ -271,22 +267,20 @@ class _ScanQrCodeState extends State<ScanQrCode> {
           sp.remove('currentJobId');
           Utils.showFlushbar('Clock-Out request Successful', context);
         } else {
-          // Handle the case where the clock-in request was not successful
-          // You might want to show an error message to the user
           Utils.showFlushbar(
               'Clock-Out request failed: ${result['message']}', context);
           print('Clock-Out request failed: ${result['message']}');
         }
       } finally {
-        // provider
-        //     .resetLoading(); // Reset loading state after the request
+        // provider.resetLoading(); // optional
       }
     }
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    // ✅ FIX 7: Null-safe dispose — no crash if controller was never initialized
+    controller?.dispose();
     super.dispose();
   }
 }

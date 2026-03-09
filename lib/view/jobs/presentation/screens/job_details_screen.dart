@@ -65,16 +65,13 @@ class JobDetailsScreen extends StatefulWidget {
 
 class _JobDetailsScreenState extends State<JobDetailsScreen> {
 
-  /// FIX: Client ID ab direct client object se bhi read hogi
-  /// Aur sirf last 6 digits show hongi
-  String getClientIdLastSix() {
+  // ✅ FIX: Poori client ID return karo — ScanQrCode ko poori ID chahiye
+  String getFullClientId() {
     final String? id = widget.clientId ??
         widget.clientInfoForAssignedJobs?.client.id ??
         widget.clientInfoForAvailableJobs?.client.id;
 
-    if (id == null || id.isEmpty) return '';
-
-    return id.length > 6 ? id.substring(id.length - 6) : id;
+    return id ?? '';
   }
 
   @override
@@ -118,7 +115,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   jobId: widget.jobId,
                   managerId: widget.shiftManagerId,
                   managerName: widget.shiftManagerName,
-                  clientId: getClientIdLastSix(), //  last 6 digits
+                  clientId: getFullClientId(), // ✅ FIX: poori ID pass karo
                 ),
                 JobDetailsWidget(
                   shiftManagerName: widget.shiftManagerName,
@@ -141,7 +138,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   clientInfoForAssignedJobs: widget.clientInfoForAssignedJobs,
                   clientInfoForAvailableJobs:
                   widget.clientInfoForAvailableJobs,
-                  clientId: getClientIdLastSix(), //  last 6 digits
+                  clientId: getFullClientId(), // ✅ FIX: poori ID pass karo
                   riskAssessment: riskAssessment,
                   livingArrangement: livingArrangement,
                   goal: goal,
